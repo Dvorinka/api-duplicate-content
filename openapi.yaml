@@ -1,0 +1,226 @@
+openapi: 3.0.3
+info:
+  title: Duplicate Content Detection API
+  description: API for detecting content similarity and potential plagiarism
+  version: 1.0.0
+  contact:
+    name: API Services
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8085
+    description: Development server
+  - url: https://api.example.com
+    description: Production server
+
+paths:
+  /healthz:
+    get:
+      summary: Health check endpoint
+      description: Returns the health status of the service
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /v1/content/compare:
+    post:
+      summary: Compare text content
+      description: Compare two text strings for similarity and potential plagiarism
+      tags:
+        - Content Analysis
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompareInput'
+      responses:
+        '200':
+          description: Successful comparison response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CompareResult'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '405':
+          description: Method not allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /v1/content/compare-url:
+    post:
+      summary: Compare content from URLs
+      description: Fetch and compare content from two URLs for similarity
+      tags:
+        - Content Analysis
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompareURLInput'
+      responses:
+        '200':
+          description: Successful URL comparison response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CompareURLResult'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '405':
+          description: Method not allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    CompareInput:
+      type: object
+      required:
+        - text_a
+        - text_b
+      properties:
+        text_a:
+          type: string
+          description: First text to compare
+          example: "The quick brown fox jumps over the lazy dog."
+        text_b:
+          type: string
+          description: Second text to compare
+          example: "A fast brown fox leaps over a sleeping dog."
+
+    CompareURLInput:
+      type: object
+      required:
+        - url_a
+        - url_b
+      properties:
+        url_a:
+          type: string
+          format: uri
+          description: First URL to fetch and compare
+          example: "https://example.com/article1"
+        url_b:
+          type: string
+          format: uri
+          description: Second URL to fetch and compare
+          example: "https://example.com/article2"
+
+    CompareResult:
+      type: object
+      properties:
+        similarity_score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Similarity score (0-1, higher is more similar)
+          example: 0.75
+        plagiarism_percent:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: Estimated plagiarism percentage
+          example: 65.0
+        token_count_a:
+          type: integer
+          description: Number of tokens in text A
+          example: 9
+        token_count_b:
+          type: integer
+          description: Number of tokens in text B
+          example: 8
+        common_tokens:
+          type: integer
+          description: Number of common tokens between texts
+          example: 6
+        assessment:
+          type: string
+          description: Assessment of similarity level
+          enum: [very_low, low, medium, high, very_high]
+          example: "high"
+
+    CompareURLResult:
+      type: object
+      description: Extended result for URL comparisons including source URLs
+      allOf:
+        - $ref: '#/components/schemas/CompareResult'
+        - type: object
+          properties:
+            url_a:
+              type: string
+              description: First URL that was compared
+              example: "https://example.com/article1"
+            url_b:
+              type: string
+              description: Second URL that was compared
+              example: "https://example.com/article2"
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "text_a and text_b are required"
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: API key for authentication (format: "Bearer YOUR_API_KEY")
+
+tags:
+  - name: Health
+    description: Health check endpoints
+  - name: Content Analysis
+    description: Content similarity and plagiarism detection
