@@ -1,4 +1,4 @@
-module duplicate-content
+module apiservices/duplicate-content
 
 go 1.25.7
 
