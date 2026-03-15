@@ -4,15 +4,15 @@ services:
   duplicate-content-api:
     build: .
     ports:
-      - "8080:8080"
+      - "30005:30005"
     environment:
-      - PORT=8080
+      - PORT=30005
       - ENVIRONMENT=${ENVIRONMENT:-development}
       - DUPLICATE_CONTENT_API_KEY=${DUPLICATE_CONTENT_API_KEY:-dev-duplicate-content-key}
       - RAPIDAPI_PROXY_SECRET=${RAPIDAPI_PROXY_SECRET:-}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/healthz"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:30005/healthz"]
       interval: 30s
       timeout: 10s
       retries: 3
