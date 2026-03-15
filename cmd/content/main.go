@@ -18,7 +18,7 @@ import (
 func main() {
 	logger := log.New(os.Stdout, "[content] ", log.LstdFlags)
 
-	port := envString("PORT", "8085")
+	port := envString("PORT", "30005")
 	apiKey := envString("CONTENT_API_KEY", "dev-content-key")
 	maxText := envInt("CONTENT_MAX_TEXT_BYTES", 200000)
 	if apiKey == "dev-content-key" {
